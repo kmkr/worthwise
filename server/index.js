@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 
 const createSurvey = require("./surveys/create");
 const createResponse = require("./responses/create");
+const sendSurveyCreatedEmail = require("./communication/survey-created-email");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -18,7 +19,13 @@ app.post("/surveys", async (req, res) => {
       ownerEmail
     });
 
-    return res.redirect(`/surveys/${result.id}/responses/new`);
+    // todo: incl host
+    const surveyUrl = `/surveys/${result.id}/responses/new`;
+    await sendSurveyCreatedEmail({
+      toEmail: ownerEmail,
+      surveyUrl
+    });
+    return res.redirect(surveyUrl);
   } catch (err) {
     console.error(err.stack);
     res.status(500).send("Oh no");
