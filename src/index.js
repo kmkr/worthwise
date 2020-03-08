@@ -1,7 +1,5 @@
 import { Fragment, render, h } from "preact";
-import CreateSurvey from "./create-survey";
-
-const App = <CreateSurvey />;
+import Routes from "./routes";
 
 const container = document.getElementById("app");
-render(App, container);
+render(<Routes />, container);
