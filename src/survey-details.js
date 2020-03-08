@@ -4,7 +4,7 @@ const SurveyDetails = ({ id }) => {
   return (
     <Fragment>
       <form method="POST" action={`/surveys/${id}/responses`}>
-        <input type="hidden" name="id" value={id} />
+        <input type="hidden" name="surveyId" value={id} />
         <div>
           <label>
             Salary

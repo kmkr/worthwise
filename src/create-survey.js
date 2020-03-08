@@ -7,7 +7,7 @@ const CreateSurvey = () => {
         Ask colleagues and peers what they earn. Use our survey to make this
         simpler, and less awkward.
       </p>
-      <form method="POST" action="/survey">
+      <form method="POST" action="/surveys">
         <div>
           <label>
             Email to receive survey link, not spam.
