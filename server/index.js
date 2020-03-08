@@ -11,6 +11,7 @@ const sendSurveyCreatedEmail = require("./communication/survey-created-email");
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/dist", express.static(path.resolve(__dirname, "..", "dist")));
+app.engine("pug", require("pug").__express);
 
 app.post("/surveys", async (req, res) => {
   const ownerEmail = req.body.email;
@@ -19,13 +20,12 @@ app.post("/surveys", async (req, res) => {
       ownerEmail
     });
 
-    // todo: incl host
-    const surveyUrl = `/surveys/${result.id}/responses/new`;
+    const surveyPathName = `/surveys/${result.id}/responses/new`;
     await sendSurveyCreatedEmail({
       toEmail: ownerEmail,
-      surveyUrl
+      surveyUrl: `${process.env.BASE_URL}${surveyPathName}`
     });
-    return res.redirect(surveyUrl);
+    return res.redirect(surveyPathName);
   } catch (err) {
     console.error(err.stack);
     res.status(500).send("Oh no");
