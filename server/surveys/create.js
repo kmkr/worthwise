@@ -1,22 +1,10 @@
-const { Client } = require("pg");
+const { pool } = require("../db/pool");
 
 const CREATE_QUERY = "INSERT INTO surveys(owner_email) VALUES($1) RETURNING *";
-module.exports = ({ ownerEmail }) =>
-  new Promise((resolve, reject) => {
-    const client = new Client({
-      connectionString: process.env.DATABASE_URL,
-      ssl: true
-    });
-
-    console.log(`Creating survey for ${ownerEmail}`);
-    client.connect();
-    client.query(CREATE_QUERY, [ownerEmail], (err, res) => {
-      client.end();
-      if (err) {
-        return reject(err);
-      }
-      const result = res.rows[0];
-      console.log(`Created survey ${result.id} for ${ownerEmail}`);
-      return resolve(result);
-    });
-  });
+module.exports = async ({ ownerEmail }) => {
+  console.log(`Creating survey for ${ownerEmail}`);
+  const results = await pool.query(CREATE_QUERY, [ownerEmail]);
+  const result = results.rows[0];
+  console.log(`Created survey ${result.id} for ${ownerEmail}`);
+  return result;
+};

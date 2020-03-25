@@ -1,28 +1,16 @@
-const { Client } = require("pg");
+const { pool } = require("./db/pool");
 const { MIN_RESULTS_FOR_UNLOCK } = require("./constants");
 const sendSurveyUnlockedEmail = require("./communication/survey-unlocked-email");
 
 async function getUnlockedSurveys() {
-  const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: true
-  });
   const query = `SELECT s.id, s.owner_email FROM surveys s, responses r WHERE r.survey_id = s.id AND s.owner_notified = 'f' GROUP BY s.id HAVING COUNT(s.id) >= ${MIN_RESULTS_FOR_UNLOCK}`;
-  await client.connect();
-  const res = await client.query(query);
-  client.end();
+  const res = await pool.query(query);
   return res.rows;
 }
 
 async function updateSurvey(surveyId) {
-  const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: true
-  });
   const query = "UPDATE surveys SET owner_notified = 't' where id = $1";
-  await client.connect();
-  await client.query(query, [surveyId]);
-  client.end();
+  return pool.query(query, [surveyId]);
 }
 
 async function resultsUnlockedTask() {
