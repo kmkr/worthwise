@@ -22,7 +22,7 @@ module.exports = ({ toEmail, surveyUrl }) => {
   };
   console.log(data);
   return new Promise((resolve, reject) => {
-    console.log(`Sending survey created email to ${toEmail}`);
+    console.log(`Sending survey created email to ${toEmail} ...`);
     mg.messages().send(data, (error, body) => {
       if (error) {
         return reject(error);
