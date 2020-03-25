@@ -1,8 +1,15 @@
 import { Fragment, h } from "preact";
+import { useEffect } from "preact/hooks";
 
-const SurveyDetails = ({ id }) => {
+const SurveyDetails = ({ id, url }) => {
+  useEffect(() => {
+    const pathname = window.location.pathname;
+    window.history.replaceState({}, document.title, pathname);
+  }, []);
+  const showModal = url.indexOf("from=create") !== -1;
   return (
     <Fragment>
+      {showModal && <div>Insert modal here</div>}
       <form method="POST" action={`/surveys/${id}/responses`}>
         <input type="hidden" name="surveyId" value={id} />
         <div>

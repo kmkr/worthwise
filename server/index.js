@@ -26,7 +26,7 @@ app.post("/surveys", async (req, res) => {
       toEmail: ownerEmail,
       surveyUrl: `${process.env.BASE_URL}${surveyPathName}`
     });
-    return res.redirect(surveyPathName);
+    return res.redirect(`${surveyPathName}?from=create`);
   } catch (err) {
     console.error(err.stack);
     res.status(500).send("Oh no");
