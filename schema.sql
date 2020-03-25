@@ -16,6 +16,7 @@ CREATE TABLE responses (
     survey_id UUID,
     salary int,
     email text,
+    user_notified boolean DEFAULT FALSE,
     PRIMARY KEY (id),
     FOREIGN KEY (survey_id) REFERENCES surveys(id)
 );

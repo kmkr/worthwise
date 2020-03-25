@@ -8,9 +8,24 @@ async function getUnlockedSurveys() {
   return res.rows;
 }
 
-async function updateSurvey(surveyId) {
+async function getResponsesFromSurvey(surveyId) {
+  const query = `SELECT id, email FROM responses r WHERE survey_id = $1 AND email IS NOT NULL`;
+  const res = await pool.query(query, [surveyId]);
+  return res.rows;
+}
+
+async function setSurveyToNotified(surveyId) {
   const query = "UPDATE surveys SET owner_notified = 't' where id = $1";
   return pool.query(query, [surveyId]);
+}
+
+async function setResponseToNotified(responseId) {
+  const query = "UPDATE responses SET user_notified = 't' where id = $1";
+  return pool.query(query, [responseId]);
+}
+
+function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
 }
 
 async function resultsUnlockedTask() {
@@ -19,14 +34,37 @@ async function resultsUnlockedTask() {
   return Promise.all(
     surveys.map(async result => {
       const surveyId = result.id;
-      console.log(`Survey ${surveyId} is unlocked, informing owner`);
+      const surveyUrl = `${process.env.BASE_URL}/surveys/${surveyId}`;
+      console.log(
+        `Survey ${surveyId} is unlocked, informing owner and respondents ...`
+      );
       await sendSurveyUnlockedEmail({
         toEmail: result.owner_email,
-        surveyUrl: `/surveys/${surveyId}`
+        surveyUrl
       });
-      await updateSurvey(surveyId);
+      await setSurveyToNotified(surveyId);
       console.log(`Owner informed for survey ${surveyId}`);
-      // todo: inform respondees
+
+      const surveyResponses = await getResponsesFromSurvey(surveyId);
+      const respondents = [];
+      console.log(`Informing ${surveyResponses.length} respondents ...`);
+      await Promise.all(
+        surveyResponses.map(async surveyResponse => {
+          if (respondents.includes(surveyResponse.email)) {
+            console.log(
+              `Already sent an email to ${surveyResponse.email}, skipping ...`
+            );
+          } else {
+            respondents.push(surveyResponse.email);
+            await sendSurveyUnlockedEmail({
+              toEmail: surveyResponse.email,
+              surveyUrl
+            });
+          }
+          await setResponseToNotified(surveyResponse.id);
+        })
+      );
+      console.log(`Respondents informed for survey ${surveyId}`);
     })
   );
 }
