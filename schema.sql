@@ -5,6 +5,7 @@ CREATE TABLE surveys (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     owner_email text,
+    owner_notified boolean DEFAULT FALSE,
     PRIMARY KEY (id)
 );
 

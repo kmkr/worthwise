@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const createSurvey = require("./surveys/create");
 const createResponse = require("./responses/create");
 const sendSurveyCreatedEmail = require("./communication/survey-created-email");
+const { initTasks } = require("./tasks");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -61,4 +62,7 @@ function htmlHandler(req, res) {
 ].forEach(pattern => app.get(pattern, htmlHandler));
 
 const port = process.env.PORT;
+
+initTasks();
+
 app.listen(port, () => console.log(`App listening on port ${port}!`));
