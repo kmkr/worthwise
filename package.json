@@ -36,6 +36,6 @@
     "preact": "^10.3.3",
     "preact-router": "^3.2.1",
     "webpack": "^4.42.0",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^3.3.12"
   }
 }
